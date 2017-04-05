@@ -23,18 +23,21 @@ object BiggestSquare {
               // Duplicate the prospects with their current size to make sure we catch the blocks even if they don't realize their full potential
               prospect.copy(potential = prospect.sizeAt(currentPos)) :: prospect :: Nil
             }
-            .filter(prospect => prospect.potential > largest) // Throw away everything that cannot produce better results we already have
-            .groupBy(_.potential) // No need to keep multiple prospects that could produce the same result
+            // Throw away everything that cannot produce better results we already have
+            .filter(prospect => prospect.potential > largest)
+            // No need to keep multiple prospects that could produce the same result
+            .groupBy(_.potential)
             .map { case (potential, prospects) =>
               // Lets keep the prospect that started at the earliest position as it has the highest probability to become realized
               prospects.minBy(_.startPos)
             }
+            .toList
             .partition(prospect => prospect.sizeAt(currentPos) == prospect.potential)
         }
 
         val newLargest = completed.map(_.potential).reduceOption(_ max _).getOrElse(largest)
 
-        (newLargest, newProspects.toList)
+        (newLargest, newProspects)
       }
       ._1
   }
